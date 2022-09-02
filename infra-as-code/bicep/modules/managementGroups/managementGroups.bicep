@@ -3,11 +3,11 @@ targetScope = 'tenant'
 @description('Prefix for the management group hierarchy.  This management group will be created as part of the deployment.')
 @minLength(2)
 @maxLength(10)
-param parTopLevelManagementGroupPrefix string = 'alz'
+param parTopLevelManagementGroupPrefix string = 'fjr-mg'
 
 @description('Display name for top level management group.  This name will be applied to the management group prefix defined in parTopLevelManagementGroupPrefix parameter.')
 @minLength(2)
-param parTopLevelManagementGroupDisplayName string = 'Azure Landing Zones'
+param parTopLevelManagementGroupDisplayName string = 'Ministry Finance and Economic Affairs'
 
 @description('Optional parent for Management Group hierarchy, used as intermediate root Management Group parent, if specified. If empty, default, will deploy beneath Tenant Root Management Group.')
 param parTopLevelManagementGroupParentId string = ''
@@ -22,7 +22,7 @@ param parLandingZoneMgConfidentialEnable bool = false
 param parLandingZoneMgChildren object = {}
 
 @description('Set Parameter to true to Opt-out of deployment telemetry')
-param parTelemetryOptOut bool = false
+// param parTelemetryOptOut bool = true
 
 // Platform and Child Management Groups
 var varPlatformMg = {
@@ -30,20 +30,6 @@ var varPlatformMg = {
   displayName: 'Platform'
 }
 
-var varPlatformManagementMg = {
-  name: '${parTopLevelManagementGroupPrefix}-platform-management'
-  displayName: 'Management'
-}
-
-var varPlatformConnectivityMg = {
-  name: '${parTopLevelManagementGroupPrefix}-platform-connectivity'
-  displayName: 'Connectivity'
-}
-
-var varPlatformIdentityMg = {
-  name: '${parTopLevelManagementGroupPrefix}-platform-identity'
-  displayName: 'Identity'
-}
 
 // Landing Zones & Child Management Groups
 var varLandingZoneMg = {
@@ -153,41 +139,41 @@ resource resDecommissionedMg 'Microsoft.Management/managementGroups@2021-04-01' 
 }
 
 // Level 3 - Child Management Groups under Platform MG
-resource resPlatformManagementMg 'Microsoft.Management/managementGroups@2021-04-01' = {
-  name: varPlatformManagementMg.name
-  properties: {
-    displayName: varPlatformManagementMg.displayName
-    details: {
-      parent: {
-        id: resPlatformMg.id
-      }
-    }
-  }
-}
+// resource resPlatformManagementMg 'Microsoft.Management/managementGroups@2021-04-01' = {
+//   name: varPlatformManagementMg.name
+//   properties: {
+//     displayName: varPlatformManagementMg.displayName
+//     details: {
+//       parent: {
+//         id: resPlatformMg.id
+//       }
+//     }
+//   }
+// }
 
-resource resPlatformConnectivityMg 'Microsoft.Management/managementGroups@2021-04-01' = {
-  name: varPlatformConnectivityMg.name
-  properties: {
-    displayName: varPlatformConnectivityMg.displayName
-    details: {
-      parent: {
-        id: resPlatformMg.id
-      }
-    }
-  }
-}
+// resource resPlatformConnectivityMg 'Microsoft.Management/managementGroups@2021-04-01' = {
+//   name: varPlatformConnectivityMg.name
+//   properties: {
+//     displayName: varPlatformConnectivityMg.displayName
+//     details: {
+//       parent: {
+//         id: resPlatformMg.id
+//       }
+//     }
+//   }
+// }
 
-resource resPlatformIdentityMg 'Microsoft.Management/managementGroups@2021-04-01' = {
-  name: varPlatformIdentityMg.name
-  properties: {
-    displayName: varPlatformIdentityMg.displayName
-    details: {
-      parent: {
-        id: resPlatformMg.id
-      }
-    }
-  }
-}
+// resource resPlatformIdentityMg 'Microsoft.Management/managementGroups@2021-04-01' = {
+//   name: varPlatformIdentityMg.name
+//   properties: {
+//     displayName: varPlatformIdentityMg.displayName
+//     details: {
+//       parent: {
+//         id: resPlatformMg.id
+//       }
+//     }
+//   }
+// }
 
 // Level 3 - Child Management Groups under Landing Zones MG
 
@@ -204,19 +190,19 @@ resource resLandingZonesChildMgs 'Microsoft.Management/managementGroups@2021-04-
 }]
 
 // Optional Deployment for Customer Usage Attribution
-module modCustomerUsageAttribution '../../CRML/customerUsageAttribution/cuaIdTenant.bicep' = if (!parTelemetryOptOut) {
-  #disable-next-line no-loc-expr-outside-params //Only to ensure telemetry data is stored in same location as deployment. See https://github.com/Azure/ALZ-Bicep/wiki/FAQ#why-are-some-linter-rules-disabled-via-the-disable-next-line-bicep-function for more information //Only to ensure telemetry data is stored in same location as deployment. See https://github.com/Azure/ALZ-Bicep/wiki/FAQ#why-are-some-linter-rules-disabled-via-the-disable-next-line-bicep-function for more information
-  name: 'pid-${varCuaid}-${uniqueString(deployment().location)}'
-  params: {}
-}
+// module modCustomerUsageAttribution '../../CRML/customerUsageAttribution/cuaIdTenant.bicep' = if (!parTelemetryOptOut) {
+//   #disable-next-line no-loc-expr-outside-params //Only to ensure telemetry data is stored in same location as deployment. See https://github.com/Azure/ALZ-Bicep/wiki/FAQ#why-are-some-linter-rules-disabled-via-the-disable-next-line-bicep-function for more information //Only to ensure telemetry data is stored in same location as deployment. See https://github.com/Azure/ALZ-Bicep/wiki/FAQ#why-are-some-linter-rules-disabled-via-the-disable-next-line-bicep-function for more information
+//   name: 'pid-${varCuaid}-${uniqueString(deployment().location)}'
+//   params: {}
+// }
 
 // Output Management Group IDs
 output outTopLevelManagementGroupId string = resTopLevelMg.id
 
 output outPlatformManagementGroupId string = resPlatformMg.id
-output outPlatformManagementManagementGroupId string = resPlatformManagementMg.id
-output outPlatformConnectivityManagementGroupId string = resPlatformConnectivityMg.id
-output outPlatformIdentityManagementGroupId string = resPlatformIdentityMg.id
+// output outPlatformManagementManagementGroupId string = resPlatformManagementMg.id
+// output outPlatformConnectivityManagementGroupId string = resPlatformConnectivityMg.id
+// output outPlatformIdentityManagementGroupId string = resPlatformIdentityMg.id
 
 output outLandingZonesManagementGroupId string = resLandingZonesMg.id
 output outLandingZoneChildrenMangementGroupIds array = [for mg in items(varLandingZoneMgChildrenUnioned): '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupPrefix}-landingzones-${mg.key}' ]
@@ -229,9 +215,9 @@ output outDecommissionedManagementGroupId string = resDecommissionedMg.id
 output outTopLevelManagementGroupName string = resTopLevelMg.name
 
 output outPlatformManagementGroupName string = resPlatformMg.name
-output outPlatformManagementManagementGroupName string = resPlatformManagementMg.name
-output outPlatformConnectivityManagementGroupName string = resPlatformConnectivityMg.name
-output outPlatformIdentityManagementGroupName string = resPlatformIdentityMg.name
+// output outPlatformManagementManagementGroupName string = resPlatformManagementMg.name
+// output outPlatformConnectivityManagementGroupName string = resPlatformConnectivityMg.name
+// output outPlatformIdentityManagementGroupName string = resPlatformIdentityMg.name
 
 output outLandingZonesManagementGroupName string = resLandingZonesMg.name
 output outLandingZoneChildrenMangementGroupNames array = [for mg in items(varLandingZoneMgChildrenUnioned): mg.value.displayName ]
